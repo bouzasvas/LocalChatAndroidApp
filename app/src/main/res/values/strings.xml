@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Local Chatting</string>
+
+    <string name="host">Host</string>
+    <string name="port">Port</string>
+    <string name="connect">Connect</string>
+
+    <string name="youLabel">You</string>
+    <string name="lobbyLabel">Lobby</string>
+    <string name="textHint">Enter your message here...</string>
+
+    <string name="action_settings">Disconnect</string>
+    <string name="sendImage">Send Image</string>
+</resources>

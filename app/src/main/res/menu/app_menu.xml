@@ -1,0 +1,11 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Settings, should always be in the overflow -->
+    <item
+        android:id="@+id/disconnect"
+        android:title="@string/action_settings" />
+
+    <item
+        android:id="@+id/sendImage"
+        android:title="@string/sendImage" />
+</menu>
