@@ -11,4 +11,12 @@
 
     <string name="action_settings">Disconnect</string>
     <string name="sendImage">Send Image</string>
+    <string name="server" translatable="false">localchatting.ddns.net</string>
+    <string name="chooseClient">Choose client to exchange messages</string>
+    <string name="refresh">Refresh List</string>
+    <string name="nickname">Give a nickname</string>
+    <string name="broadcast">Broadcast Message</string>
+    <string name="setNick">Set</string>
+    <string name="notificationTitle">New Message!</string>
+    <string name="notificationDes">You have a new message from</string>
 </resources>

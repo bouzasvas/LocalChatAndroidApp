@@ -1,52 +1,48 @@
 package test.android.vassilis.localchatting;
 
-import android.content.Context;
-import android.content.DialogInterface;
+
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
-import android.support.v7.app.AlertDialog;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import org.w3c.dom.Text;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.InetAddress;
 import java.net.Socket;
 
 public class MainActivity extends AppCompatActivity {
 
     private static final int SELECT_PHOTO = 100;
 
-    String port;
-    String host;
+    NotificationCompat.Builder mBuilder;
 
-    connectToServer connection = new connectToServer();
+    exchangeMsgs communication = new exchangeMsgs();
+    Socket connection = null;
 
     TextView myMessages, lobbyMessages;
     EditText newMessage;
+
+    String user;
 
     Handler handler;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
@@ -54,12 +50,15 @@ public class MainActivity extends AppCompatActivity {
         lobbyMessages = (TextView) findViewById(R.id.lobbyMessages);
         newMessage = (EditText) findViewById(R.id.newMessage);
 
-        Intent intent = getIntent();
-        host = intent.getStringExtra("host");
-        port = intent.getStringExtra("port");
-
         handler = new Handler(Looper.getMainLooper());
-        connectionToServer();
+        connection = SocketHandler.getSocket();
+
+        Intent intent = getIntent();
+        user = intent.getStringExtra("user");
+
+        initNoticationBuilder();
+
+        startCommunication();
     }
 
     // Initiating Menu XML file (menu.xml)
@@ -92,14 +91,38 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    private void initNoticationBuilder() {
+        mBuilder =
+                new NotificationCompat.Builder(MainActivity.this)
+                        .setSmallIcon(R.drawable.notification_icon)
+                        .setContentTitle(getString(R.string.notificationTitle))
+                        .setContentText(getString(R.string.notificationDes) + " " + user)
+                        .setAutoCancel(true);
+
+//        Intent resultIntent = new Intent(this, MainActivity.class);
+//        resultIntent.setAction(Intent.ACTION_MAIN);
+//        resultIntent.addCategory(Intent.CATEGORY_LAUNCHER);
+//
+//        PendingIntent resultPendingIntent =
+//                PendingIntent.getActivity(
+//                        this,
+//                        0,
+//                        resultIntent,
+//                        0
+//                );
+//
+
+//        mBuilder.setContentIntent(resultPendingIntent);
+    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        connection.close();
+        communication.close();
     }
 
-    public void connectionToServer() {
-        connection.execute(host, port);
+    public void startCommunication() {
+        communication.execute(connection);
     }
 
     public void setTextMsg(int which, String msg) {
@@ -111,66 +134,34 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public class connectToServer extends AsyncTask<String, Void, Socket> {
+    public class exchangeMsgs extends AsyncTask<Socket, Void, Socket> {
 
         Socket connection = null;
 
         ObjectOutputStream out = null;
         ObjectInputStream in = null;
 
-        AlertDialog dialog = null;
 
         @Override
         protected void onPreExecute() {
             super.onPreExecute();
-
-            dialog = new AlertDialog.Builder(MainActivity.this).create();
         }
 
         @Override
-        protected Socket doInBackground(String... params) {
-            String host = (String) params[0];
-            int port = Integer.valueOf((String) params[1]);
+        protected Socket doInBackground(Socket... params) {
+            this.connection = params[0];
+            out = SocketHandler.getOut();
+            in = SocketHandler.getIn();
 
-            if (isNetworkAvailable()) {
-                try {
-                    connection = new Socket(InetAddress.getByName(host), port);
-                    out = new ObjectOutputStream(connection.getOutputStream());
-                    in = new ObjectInputStream(connection.getInputStream());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
             return connection;
         }
 
         @Override
         protected void onPostExecute(Socket soc) {
             super.onPostExecute(soc);
+            getMsg();
+            sendMsg();
 
-            if (soc != null) {
-                Toast.makeText(MainActivity.this, "Successfully connected to " + soc.getInetAddress(), Toast.LENGTH_LONG).show();
-                getMsg();
-                sendMsg();
-            } else {
-                dialog.setTitle("Error!");
-                dialog.setMessage("Connection failed");
-                dialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                System.exit(1);
-                            }
-                        });
-                dialog.show();
-            }
-        }
-
-
-        private boolean isNetworkAvailable() {
-            ConnectivityManager connectivityManager
-                    = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo activeNetworkInfo = connectivityManager.getActiveNetworkInfo();
-            return activeNetworkInfo != null && activeNetworkInfo.isConnected();
         }
 
         public void getMsg() {
@@ -185,6 +176,7 @@ public class MainActivity extends AppCompatActivity {
                         String messageFromUser = null;
                         try {
                             messageFromUser = (String) in.readObject();
+                            notifyForNewMsg();
                         } catch (IOException e) {
                             e.printStackTrace();
                         } catch (ClassNotFoundException e) {
@@ -234,6 +226,13 @@ public class MainActivity extends AppCompatActivity {
             };
             Thread sendM = new Thread(send);
             sendM.start();
+        }
+
+        public void notifyForNewMsg() {
+            int mNotificationId = 001;
+            NotificationManager mNotifyMgr =
+                    (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+            mNotifyMgr.notify(mNotificationId, mBuilder.build());
         }
 
         public void close() {

@@ -26,10 +26,10 @@ public class serverConnect extends AppCompatActivity {
         connect.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent mainScreen = new Intent(v.getContext(), MainActivity.class);
-                mainScreen.putExtra("host", host.getText().toString());
-                mainScreen.putExtra("port", port.getText().toString());
-                startActivity(mainScreen);
+                Intent selectClient = new Intent(v.getContext(), selectClient.class);
+                selectClient.putExtra("host", host.getText().toString());
+                selectClient.putExtra("port", port.getText().toString());
+                startActivity(selectClient);
             }
         });
     }

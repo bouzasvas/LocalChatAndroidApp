@@ -1,0 +1,77 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    tools:context="test.android.vassilis.localchatting.selectClient"
+    android:background="@drawable/mes_background"
+    android:gravity="center_vertical|center_horizontal"
+    android:weightSum="1">
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:weightSum="4">
+
+        <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName"
+            android:ems="10"
+            android:id="@+id/nickname"
+            android:hint="@string/nickname"
+            android:layout_weight="3" />
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/setNick"
+            android:id="@+id/setNick"
+            android:layout_weight="1" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/chooseClient"
+        android:id="@+id/chooseClientLabel"
+        android:layout_gravity="left|center_vertical"
+        android:textSize="15sp"
+        android:textColor="#000000"
+        android:singleLine="false"
+        android:textStyle="bold|italic"
+        android:textAlignment="center"
+        android:visibility="invisible" />
+
+    <ListView
+        android:layout_width="match_parent"
+        android:layout_height="226dp"
+        android:id="@+id/availableUsers"
+        android:layout_gravity="center_horizontal"
+        android:background="@color/button_material_light"
+        android:choiceMode="singleChoice"
+        android:layout_weight="0.94"
+        android:visibility="invisible" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/refresh"
+        android:id="@+id/resfreshButton"
+        android:layout_gravity="right|center_vertical"
+        android:visibility="invisible" />
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/broadcast"
+        android:id="@+id/broadcastButton"
+        android:visibility="invisible" />
+
+</LinearLayout>
