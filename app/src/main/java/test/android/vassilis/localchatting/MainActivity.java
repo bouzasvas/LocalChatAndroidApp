@@ -4,6 +4,8 @@ package test.android.vassilis.localchatting;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.media.RingtoneManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Looper;
@@ -33,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
     exchangeMsgs communication = new exchangeMsgs();
     Socket connection = null;
 
-    TextView myMessages, lobbyMessages;
+    TextView myMessages, lobbyMessages, lobbyLabel;
     EditText newMessage;
 
     String user;
@@ -48,6 +50,9 @@ public class MainActivity extends AppCompatActivity {
 
         myMessages = (TextView) findViewById(R.id.myMessages);
         lobbyMessages = (TextView) findViewById(R.id.lobbyMessages);
+
+        lobbyLabel = (TextView) findViewById(R.id.lobbyLabel);
+
         newMessage = (EditText) findViewById(R.id.newMessage);
 
         handler = new Handler(Looper.getMainLooper());
@@ -55,6 +60,8 @@ public class MainActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
         user = intent.getStringExtra("user");
+
+        lobbyLabel.setText(user);
 
         initNoticationBuilder();
 
@@ -98,6 +105,9 @@ public class MainActivity extends AppCompatActivity {
                         .setContentTitle(getString(R.string.notificationTitle))
                         .setContentText(getString(R.string.notificationDes) + " " + user)
                         .setAutoCancel(true);
+
+        Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+        mBuilder.setSound(sound);
 
 //        Intent resultIntent = new Intent(this, MainActivity.class);
 //        resultIntent.setAction(Intent.ACTION_MAIN);
