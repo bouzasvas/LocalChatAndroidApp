@@ -42,6 +42,8 @@ public class MainActivity extends AppCompatActivity {
 
     Handler handler;
 
+    ReadWriteConversation IO;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -65,6 +67,10 @@ public class MainActivity extends AppCompatActivity {
 
         initNoticationBuilder();
 
+        IO = new ReadWriteConversation(user);
+
+        IO.readFile(true, myMessages);
+        IO.readFile(false, lobbyMessages);
         startCommunication();
     }
 
@@ -109,20 +115,29 @@ public class MainActivity extends AppCompatActivity {
         Uri sound = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         mBuilder.setSound(sound);
 
-//        Intent resultIntent = new Intent(this, MainActivity.class);
-//        resultIntent.setAction(Intent.ACTION_MAIN);
-//        resultIntent.addCategory(Intent.CATEGORY_LAUNCHER);
-//
-//        PendingIntent resultPendingIntent =
-//                PendingIntent.getActivity(
-//                        this,
-//                        0,
-//                        resultIntent,
-//                        0
-//                );
-//
+        Intent resultIntent = new Intent(this, MainActivity.class);
+        //resultIntent.putExtra("user", user);
+        resultIntent.setAction(Intent.ACTION_MAIN);
+        resultIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        resultIntent.addCategory(Intent.CATEGORY_LAUNCHER);
 
-//        mBuilder.setContentIntent(resultPendingIntent);
+        PendingIntent resultPendingIntent =
+                PendingIntent.getActivity(
+                        this,
+                        0,
+                        resultIntent,
+                        0
+                );
+
+
+        mBuilder.setContentIntent(resultPendingIntent);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+//        IO.writeFile(myMessages, true);
+//        IO.writeFile(lobbyMessages, false);
     }
 
     @Override
@@ -187,9 +202,7 @@ public class MainActivity extends AppCompatActivity {
                         try {
                             messageFromUser = (String) in.readObject();
                             notifyForNewMsg();
-                        } catch (IOException e) {
-                            e.printStackTrace();
-                        } catch (ClassNotFoundException e) {
+                        } catch (IOException | ClassNotFoundException e) {
                             e.printStackTrace();
                         }
                         msg = messageFromUser;
@@ -198,6 +211,9 @@ public class MainActivity extends AppCompatActivity {
                                 setTextMsg(1, msg);
                             }
                         });
+                        synchronized (IO.file) {
+                            IO.writeFile("-" + msg, false);
+                        }
                     }
                 }
             };
@@ -221,6 +237,9 @@ public class MainActivity extends AppCompatActivity {
                                         }
                                     });
                                     String messageToSend = newMessage.getText().toString();
+                                    synchronized (IO.file) {
+                                        IO.writeFile("-" + messageToSend, true);
+                                    }
                                     try {
                                         out.writeObject(messageToSend);
                                     } catch (IOException e) {

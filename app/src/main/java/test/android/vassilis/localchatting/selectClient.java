@@ -3,6 +3,7 @@ package test.android.vassilis.localchatting;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
@@ -64,6 +65,8 @@ public class selectClient extends AppCompatActivity {
             }
         });
 
+        alreadyUser();
+
         refreshButton = (Button) findViewById(R.id.resfreshButton);
         refreshButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -104,6 +107,12 @@ public class selectClient extends AppCompatActivity {
         port = intent.getStringExtra("port");
 
         //connectionToServer();
+    }
+
+    private void alreadyUser() {
+        SharedPreferences sharedPref = getSharedPreferences("pref", 0);
+        String nickN = sharedPref.getString("nickname", nickname.getText().toString());
+        nickname.setText(nickN);
     }
 
     @Override
@@ -186,6 +195,14 @@ public class selectClient extends AppCompatActivity {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+            // Create object of SharedPreferences.
+            SharedPreferences sharedPref = getSharedPreferences("pref", 0);
+            //now get Editor
+            SharedPreferences.Editor editor = sharedPref.edit();
+            //put your value
+            editor.putString("nickname", nick);
+            //commits your edits
+            editor.apply();
 
         }
 
@@ -208,9 +225,7 @@ public class selectClient extends AppCompatActivity {
                                 try {
                                     out.writeObject("0");
                                     clients = (String[]) in.readObject();
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                } catch (ClassNotFoundException e) {
+                                } catch (IOException | ClassNotFoundException e) {
                                     e.printStackTrace();
                                 }
                                 showClients();
