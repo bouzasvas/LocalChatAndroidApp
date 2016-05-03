@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Local Chatting</string>
+
+    <string name="host">Εξυπηρετητής</string>
+    <string name="port">Port</string>
+    <string name="connect">Σύνδεση</string>
+
+    <string name="youLabel">Εσύ</string>
+    <string name="lobbyLabel">Δίκτυο</string>
+    <string name="textHint">Εδώ εισάγετε το μήνυμά σας...</string>
+
+    <string name="action_settings">Αποσύνδεση</string>
+    <string name="sendImage">Αποστολή εικόνας</string>
+    <string name="chooseClient">Επέλεξε χρήστη για ανταλλαγή μηνυμάτων</string>
+    <string name="refresh">Ανανέωση Λίστας</string>
+    <string name="nickname">Δώσε ένα ψευδώνυμο</string>
+    <string name="broadcast">Μήνυμα προς όλους</string>
+    <string name="setNick">Έτοιμος</string>
+    <string name="notificationTitle">Νέο Μήνυμα!</string>
+    <string name="notificationDes">Έχεις νέο μήνυμα από</string>
+</resources>
