@@ -175,7 +175,7 @@ public class selectClient extends AppCompatActivity {
 
                 setNickName();
                 initClients(true);
-            } else {
+            } else if (soc.isClosed()) {
                 dialog.setTitle("Error!");
                 dialog.setMessage("Connection failed");
                 dialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
