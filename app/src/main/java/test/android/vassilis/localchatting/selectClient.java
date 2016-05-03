@@ -39,6 +39,7 @@ public class selectClient extends AppCompatActivity {
 
     connectAndDisplayAvailableClients conn = new connectAndDisplayAvailableClients();
 
+    AlertDialog dialog = null;
     Handler handler;
 
     String host;
@@ -66,6 +67,7 @@ public class selectClient extends AppCompatActivity {
         });
 
         alreadyUser();
+        dialog = new AlertDialog.Builder(selectClient.this).create();
 
         refreshButton = (Button) findViewById(R.id.resfreshButton);
         refreshButton.setOnClickListener(new View.OnClickListener() {
@@ -115,6 +117,18 @@ public class selectClient extends AppCompatActivity {
         nickname.setText(nickN);
     }
 
+    private void showAlertDialog(String msg) {
+        dialog.setTitle("Connection failed");
+        dialog.setMessage(msg);
+        dialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        System.exit(1);
+                    }
+                });
+        dialog.show();
+    }
+
     @Override
     protected void onPause() {
         super.onPause();
@@ -133,18 +147,11 @@ public class selectClient extends AppCompatActivity {
     public class connectAndDisplayAvailableClients extends AsyncTask<String, Void, Socket> {
 
         Socket connection = null;
+        String dialogMsg = "Server is probably offline...";
 
         ObjectOutputStream out = null;
         ObjectInputStream in = null;
 
-        AlertDialog dialog = null;
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-            dialog = new AlertDialog.Builder(selectClient.this).create();
-        }
 
         @Override
         protected Socket doInBackground(String... params) {
@@ -159,6 +166,13 @@ public class selectClient extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+            } else {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        showAlertDialog("Your wifi/data connection is closed");
+                    }
+                });
             }
             return connection;
         }
@@ -175,16 +189,8 @@ public class selectClient extends AppCompatActivity {
 
                 setNickName();
                 initClients(true);
-            } else if (soc.isClosed()) {
-                dialog.setTitle("Error!");
-                dialog.setMessage("Connection failed");
-                dialog.setButton(AlertDialog.BUTTON_NEUTRAL, "OK",
-                        new DialogInterface.OnClickListener() {
-                            public void onClick(DialogInterface dialog, int which) {
-                                System.exit(1);
-                            }
-                        });
-                dialog.show();
+            } else {
+                dialogMsg = "Your wifi/data connection is closed..";
             }
         }
 
